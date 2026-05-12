@@ -1,0 +1,122 @@
+services:
+  h2:
+    image: thomseno/h2:latest
+    container_name: gesalqveh-h2
+    volumes:
+      - h2data:/h2-data
+    ports:
+      - "9092:9092"
+      - "8082:8082"
+    networks:
+      - gesalqveh-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8082 > /dev/null || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  eureka:
+    build:
+      context: ./BACKEND
+      dockerfile: eureka-server/Dockerfile
+    container_name: gesalqveh-eureka
+    environment:
+      EUREKA_HOSTNAME: eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - gesalqveh-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health 2>/dev/null || wget -qO- http://localhost:8761 2>/dev/null | grep -q Eureka"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  buscador:
+    build:
+      context: ./BACKEND
+      dockerfile: buscador/Dockerfile
+    container_name: gesalqveh-buscador
+    depends_on:
+      h2:
+        condition: service_healthy
+      eureka:
+        condition: service_started
+    environment:
+      EUREKA_URI: http://eureka:8761/eureka/
+      DATASOURCE_URL: jdbc:h2:tcp://h2:9092//h2-data/gesalqveh
+      DATASOURCE_USERNAME: sa
+      DATASOURCE_PASSWORD: ""
+    networks:
+      - gesalqveh-net
+
+  operador:
+    build:
+      context: ./BACKEND
+      dockerfile: operador/Dockerfile
+    container_name: gesalqveh-operador
+    depends_on:
+      h2:
+        condition: service_healthy
+      eureka:
+        condition: service_started
+      buscador:
+        condition: service_started
+    environment:
+      EUREKA_URI: http://eureka:8761/eureka/
+      DATASOURCE_URL: jdbc:h2:tcp://h2:9092//h2-data/gesalqveh
+      DATASOURCE_USERNAME: sa
+      DATASOURCE_PASSWORD: ""
+    networks:
+      - gesalqveh-net
+
+  dashboard:
+    build:
+      context: ./BACKEND
+      dockerfile: dashboard/Dockerfile
+    container_name: gesalqveh-dashboard
+    depends_on:
+      h2:
+        condition: service_healthy
+      eureka:
+        condition: service_started
+      buscador:
+        condition: service_started
+    environment:
+      EUREKA_URI: http://eureka:8761/eureka/
+      DATASOURCE_URL: jdbc:h2:tcp://h2:9092//h2-data/gesalqveh
+      DATASOURCE_USERNAME: sa
+      DATASOURCE_PASSWORD: ""
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+    networks:
+      - gesalqveh-net
+
+  gateway:
+    build:
+      context: ./BACKEND
+      dockerfile: gateway/Dockerfile
+    container_name: gesalqveh-gateway
+    depends_on:
+      eureka:
+        condition: service_started
+      buscador:
+        condition: service_started
+      operador:
+        condition: service_started
+      dashboard:
+        condition: service_started
+    environment:
+      EUREKA_URI: http://eureka:8761/eureka/
+    ports:
+      - "8080:8080"
+    networks:
+      - gesalqveh-net
+
+networks:
+  gesalqveh-net:
+    driver: bridge
+
+volumes:
+  h2data:
