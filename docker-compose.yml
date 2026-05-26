@@ -114,6 +114,18 @@ services:
     networks:
       - gesalqveh-net
 
+  frontend:
+    build:
+      context: ./FRONTEND/gesalqveh-web
+      dockerfile: Dockerfile
+    container_name: gesalqveh-frontend
+    depends_on:
+      - gateway
+    ports:
+      - "${FRONTEND_PORT:-90}:80"
+    networks:
+      - gesalqveh-net
+
 networks:
   gesalqveh-net:
     driver: bridge
