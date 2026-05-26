@@ -1,0 +1,123 @@
+<mat-card class="filters">
+  <form [formGroup]="filterForm" (ngSubmit)="buscar()">
+    <div class="grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Marca</mat-label>
+        <input matInput formControlName="marca" placeholder="Toyota, BMW...">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="tipo">
+          <mat-option value="">Todos</mat-option>
+          @for (t of tipos; track t) {
+            <mat-option [value]="t">{{ t }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Transmisión</mat-label>
+        <mat-select formControlName="transmision">
+          <mat-option value="">Cualquiera</mat-option>
+          @for (t of transmisiones; track t) {
+            <mat-option [value]="t">{{ t }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Combustible</mat-label>
+        <mat-select formControlName="combustible">
+          <mat-option value="">Cualquiera</mat-option>
+          @for (c of combustibles; track c) {
+            <mat-option [value]="c">{{ c }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoría</mat-label>
+        <mat-select formControlName="categoria">
+          <mat-option value="">Cualquiera</mat-option>
+          @for (c of categorias; track c) {
+            <mat-option [value]="c">{{ c }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Precio mín. (€/día)</mat-label>
+        <input matInput type="number" formControlName="precioMin">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Precio máx. (€/día)</mat-label>
+        <input matInput type="number" formControlName="precioMax">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Disponibilidad</mat-label>
+        <mat-select formControlName="disponible">
+          <mat-option [value]="null">Todos</mat-option>
+          <mat-option [value]="true">Solo disponibles</mat-option>
+          <mat-option [value]="false">Solo no disponibles</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="actions">
+      <button mat-flat-button color="primary" type="submit">
+        <mat-icon>search</mat-icon>
+        Buscar
+      </button>
+      <button mat-stroked-button type="button" (click)="limpiar()">
+        <mat-icon>refresh</mat-icon>
+        Limpiar
+      </button>
+    </div>
+  </form>
+</mat-card>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+} @else {
+  <div class="results">
+    @if (vehiculos().length === 0) {
+      <p class="empty">No se encontraron vehículos con esos criterios.</p>
+    }
+    @for (v of vehiculos(); track v.id) {
+      <mat-card class="vehiculo">
+        <img mat-card-image [src]="v.urlImagen || 'https://picsum.photos/seed/v0/600/400'" [alt]="v.marca + ' ' + v.modelo">
+        <mat-card-header>
+          <mat-card-title>{{ v.marca }} {{ v.modelo }}</mat-card-title>
+          <mat-card-subtitle>{{ v.anio }} · {{ v.matricula }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chips">
+            <mat-chip>{{ v.tipo }}</mat-chip>
+            @if (v.transmision) { <mat-chip>{{ v.transmision }}</mat-chip> }
+            @if (v.combustible) { <mat-chip>{{ v.combustible }}</mat-chip> }
+            @if (v.categoria) { <mat-chip>{{ v.categoria }}</mat-chip> }
+          </div>
+          <p class="price">{{ v.precioDiario | number:'1.2-2' }} €/día</p>
+          <p class="status" [class.unavailable]="!v.disponible">
+            <mat-icon>{{ v.disponible ? 'check_circle' : 'block' }}</mat-icon>
+            @if (v.disponible) {
+              Disponible
+            } @else if (v.proximaDisponibilidad) {
+              Disponible desde {{ v.proximaDisponibilidad | date:'shortDate' }}
+            } @else {
+              No disponible
+            }
+          </p>
+        </mat-card-content>
+        <mat-card-actions>
+          <a mat-flat-button color="primary" [routerLink]="['/vehiculos', v.id]">Ver detalle</a>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+}

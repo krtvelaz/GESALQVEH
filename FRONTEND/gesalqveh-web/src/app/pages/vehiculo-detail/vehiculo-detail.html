@@ -1,0 +1,34 @@
+@if (vehiculo(); as v) {
+  <mat-card class="detalle">
+    <img mat-card-image [src]="v.urlImagen || 'https://picsum.photos/seed/v0/600/400'" [alt]="v.marca + ' ' + v.modelo">
+    <mat-card-header>
+      <mat-card-title>{{ v.marca }} {{ v.modelo }} <small>({{ v.anio }})</small></mat-card-title>
+      <mat-card-subtitle>Matrícula {{ v.matricula }} · {{ v.sucursal }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p class="descripcion">{{ v.descripcion }}</p>
+      <div class="chips">
+        <mat-chip>{{ v.tipo }}</mat-chip>
+        @if (v.transmision) { <mat-chip>{{ v.transmision }}</mat-chip> }
+        @if (v.combustible) { <mat-chip>{{ v.combustible }}</mat-chip> }
+        @if (v.categoria) { <mat-chip>{{ v.categoria }}</mat-chip> }
+        @if (v.color) { <mat-chip>{{ v.color }}</mat-chip> }
+        @if (v.plazas) { <mat-chip>{{ v.plazas }} plazas</mat-chip> }
+      </div>
+      <p class="price">{{ v.precioDiario | number:'1.2-2' }} €/día</p>
+      @if (v.kilometraje != null) {
+        <p>Kilometraje: <strong>{{ v.kilometraje | number }}</strong> km</p>
+      }
+      <p class="status" [class.unavailable]="!v.disponible">
+        <mat-icon>{{ v.disponible ? 'check_circle' : 'block' }}</mat-icon>
+        {{ v.disponible ? 'Disponible para alquilar' : 'No disponible' }}
+      </p>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-flat-button color="primary" [disabled]="!v.disponible" (click)="alquilar()">
+        <mat-icon>event_available</mat-icon>
+        Alquilar
+      </button>
+    </mat-card-actions>
+  </mat-card>
+}

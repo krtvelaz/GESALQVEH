@@ -1,0 +1,45 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+table {
+  width: 100%;
+}
+
+.empty {
+  text-align: center;
+  color: #777;
+  padding: 32px;
+}
+
+.empty-card {
+  text-align: center;
+  padding: 48px 24px;
+  max-width: 480px;
+  margin: 32px auto;
+
+  .big-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #1565c0;
+  }
+
+  h2 {
+    margin: 16px 0 8px;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 24px;
+  }
+}

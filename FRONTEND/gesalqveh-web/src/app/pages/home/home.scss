@@ -1,0 +1,23 @@
+.hero {
+  text-align: center;
+  padding: 48px 16px;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  border-radius: 12px;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 2.5rem;
+    margin: 0 0 8px;
+  }
+
+  p {
+    color: #555;
+    margin-bottom: 24px;
+  }
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}

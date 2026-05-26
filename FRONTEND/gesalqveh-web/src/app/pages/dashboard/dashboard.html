@@ -1,0 +1,137 @@
+<section class="metrics">
+  <mat-card class="metric metric--blue">
+    <mat-icon>event_busy</mat-icon>
+    <div>
+      <p class="label">Alquilados</p>
+      <p class="value">{{ resumen().alquilados }}</p>
+    </div>
+  </mat-card>
+  <mat-card class="metric metric--orange">
+    <mat-icon>schedule</mat-icon>
+    <div>
+      <p class="label">Próximos a vencer (≤3 días)</p>
+      <p class="value">{{ resumen().proximos }}</p>
+    </div>
+  </mat-card>
+  <mat-card class="metric metric--red">
+    <mat-icon>error</mat-icon>
+    <div>
+      <p class="label">Vencidos</p>
+      <p class="value">{{ resumen().vencidos }}</p>
+    </div>
+  </mat-card>
+  <mat-card class="metric metric--green">
+    <mat-icon>check_circle</mat-icon>
+    <div>
+      <p class="label">Disponibles</p>
+      <p class="value">{{ resumen().disponibles }}</p>
+    </div>
+  </mat-card>
+</section>
+
+<mat-card class="tab-wrap">
+  <mat-tab-group>
+    <mat-tab label="Alquilados">
+      <table mat-table [dataSource]="alquilados()" class="mat-elevation-z0">
+        <ng-container matColumnDef="id"><th mat-header-cell *matHeaderCellDef>#</th><td mat-cell *matCellDef="let a">{{ a.id }}</td></ng-container>
+        <ng-container matColumnDef="vehiculo"><th mat-header-cell *matHeaderCellDef>Vehículo</th><td mat-cell *matCellDef="let a">{{ a.vehiculoDescripcion }} ({{ a.vehiculoMatricula }})</td></ng-container>
+        <ng-container matColumnDef="cliente"><th mat-header-cell *matHeaderCellDef>Cliente</th><td mat-cell *matCellDef="let a">{{ a.clienteNombre }}</td></ng-container>
+        <ng-container matColumnDef="periodo"><th mat-header-cell *matHeaderCellDef>Periodo</th><td mat-cell *matCellDef="let a">{{ a.fechaInicio | date:'shortDate' }} → {{ a.fechaFin | date:'shortDate' }}</td></ng-container>
+        <ng-container matColumnDef="estado"><th mat-header-cell *matHeaderCellDef>Estado</th><td mat-cell *matCellDef="let a"><mat-chip>{{ a.estado }}</mat-chip></td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="alqColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: alqColumns"></tr>
+      </table>
+      @if (alquilados().length === 0) { <p class="empty">Sin alquileres activos.</p> }
+    </mat-tab>
+
+    <mat-tab label="Próximos">
+      <table mat-table [dataSource]="proximos()" class="mat-elevation-z0">
+        <ng-container matColumnDef="id"><th mat-header-cell *matHeaderCellDef>#</th><td mat-cell *matCellDef="let a">{{ a.id }}</td></ng-container>
+        <ng-container matColumnDef="vehiculo"><th mat-header-cell *matHeaderCellDef>Vehículo</th><td mat-cell *matCellDef="let a">{{ a.vehiculoDescripcion }}</td></ng-container>
+        <ng-container matColumnDef="cliente"><th mat-header-cell *matHeaderCellDef>Cliente</th><td mat-cell *matCellDef="let a">{{ a.clienteNombre }}</td></ng-container>
+        <ng-container matColumnDef="periodo"><th mat-header-cell *matHeaderCellDef>Vence</th><td mat-cell *matCellDef="let a">{{ a.fechaFin | date:'shortDate' }}</td></ng-container>
+        <ng-container matColumnDef="estado"><th mat-header-cell *matHeaderCellDef>Estado</th><td mat-cell *matCellDef="let a"><mat-chip color="warn">{{ a.estado }}</mat-chip></td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="alqColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: alqColumns"></tr>
+      </table>
+      @if (proximos().length === 0) { <p class="empty">Ninguno próximo a vencer.</p> }
+    </mat-tab>
+
+    <mat-tab label="Vencidos">
+      <table mat-table [dataSource]="vencidos()" class="mat-elevation-z0">
+        <ng-container matColumnDef="id"><th mat-header-cell *matHeaderCellDef>#</th><td mat-cell *matCellDef="let a">{{ a.id }}</td></ng-container>
+        <ng-container matColumnDef="vehiculo"><th mat-header-cell *matHeaderCellDef>Vehículo</th><td mat-cell *matCellDef="let a">{{ a.vehiculoDescripcion }}</td></ng-container>
+        <ng-container matColumnDef="cliente"><th mat-header-cell *matHeaderCellDef>Cliente</th><td mat-cell *matCellDef="let a">{{ a.clienteNombre }}</td></ng-container>
+        <ng-container matColumnDef="fechaFin"><th mat-header-cell *matHeaderCellDef>Vencía</th><td mat-cell *matCellDef="let a">{{ a.fechaFin | date:'shortDate' }}</td></ng-container>
+        <ng-container matColumnDef="diasVencidos"><th mat-header-cell *matHeaderCellDef>Días vencido</th><td mat-cell *matCellDef="let a">{{ a.diasVencidos }}</td></ng-container>
+        <ng-container matColumnDef="recargo"><th mat-header-cell *matHeaderCellDef>Recargo</th><td mat-cell *matCellDef="let a" class="recargo">{{ a.recargo | number:'1.2-2' }} €</td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="vencColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: vencColumns"></tr>
+      </table>
+      @if (vencidos().length === 0) { <p class="empty">Sin alquileres vencidos.</p> }
+    </mat-tab>
+
+    <mat-tab label="Disponibles">
+      <table mat-table [dataSource]="disponibles()" class="mat-elevation-z0">
+        <ng-container matColumnDef="matricula"><th mat-header-cell *matHeaderCellDef>Matrícula</th><td mat-cell *matCellDef="let v">{{ v.matricula }}</td></ng-container>
+        <ng-container matColumnDef="vehiculo"><th mat-header-cell *matHeaderCellDef>Vehículo</th><td mat-cell *matCellDef="let v">{{ v.marca }} {{ v.modelo }}</td></ng-container>
+        <ng-container matColumnDef="tipo"><th mat-header-cell *matHeaderCellDef>Tipo</th><td mat-cell *matCellDef="let v">{{ v.tipo }}</td></ng-container>
+        <ng-container matColumnDef="precio"><th mat-header-cell *matHeaderCellDef>Precio/día</th><td mat-cell *matCellDef="let v">{{ v.precioDiario | number:'1.2-2' }} €</td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="disponiblesColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: disponiblesColumns"></tr>
+      </table>
+      @if (disponibles().length === 0) { <p class="empty">Sin vehículos disponibles.</p> }
+    </mat-tab>
+  </mat-tab-group>
+</mat-card>
+
+<mat-card class="crud">
+  <div class="crud-header">
+    <h3>Vehículos</h3>
+    <button mat-flat-button color="primary" (click)="nuevoVehiculo()">
+      <mat-icon>add</mat-icon>
+      Nuevo
+    </button>
+  </div>
+  <table mat-table [dataSource]="vehiculos()">
+    <ng-container matColumnDef="matricula"><th mat-header-cell *matHeaderCellDef>Matrícula</th><td mat-cell *matCellDef="let v">{{ v.matricula }}</td></ng-container>
+    <ng-container matColumnDef="vehiculo"><th mat-header-cell *matHeaderCellDef>Vehículo</th><td mat-cell *matCellDef="let v">{{ v.marca }} {{ v.modelo }} ({{ v.anio }})</td></ng-container>
+    <ng-container matColumnDef="tipo"><th mat-header-cell *matHeaderCellDef>Tipo</th><td mat-cell *matCellDef="let v">{{ v.tipo }}</td></ng-container>
+    <ng-container matColumnDef="precio"><th mat-header-cell *matHeaderCellDef>Precio/día</th><td mat-cell *matCellDef="let v">{{ v.precioDiario | number:'1.2-2' }} €</td></ng-container>
+    <ng-container matColumnDef="disponible"><th mat-header-cell *matHeaderCellDef>Disponible</th><td mat-cell *matCellDef="let v">{{ v.disponible ? 'Sí' : 'No' }}</td></ng-container>
+    <ng-container matColumnDef="acciones">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let v">
+        <button mat-icon-button (click)="editarVehiculo(v)" matTooltip="Editar"><mat-icon>edit</mat-icon></button>
+        <button mat-icon-button color="warn" (click)="eliminarVehiculo(v)" matTooltip="Eliminar"><mat-icon>delete</mat-icon></button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="vehColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: vehColumns"></tr>
+  </table>
+</mat-card>
+
+<mat-card class="crud">
+  <div class="crud-header">
+    <h3>Clientes</h3>
+    <button mat-flat-button color="primary" (click)="nuevoCliente()">
+      <mat-icon>add</mat-icon>
+      Nuevo
+    </button>
+  </div>
+  <table mat-table [dataSource]="clientes()">
+    <ng-container matColumnDef="nombre"><th mat-header-cell *matHeaderCellDef>Nombre</th><td mat-cell *matCellDef="let c">{{ c.nombre }}</td></ng-container>
+    <ng-container matColumnDef="dni"><th mat-header-cell *matHeaderCellDef>DNI</th><td mat-cell *matCellDef="let c">{{ c.dni }}</td></ng-container>
+    <ng-container matColumnDef="telefono"><th mat-header-cell *matHeaderCellDef>Teléfono</th><td mat-cell *matCellDef="let c">{{ c.telefono }}</td></ng-container>
+    <ng-container matColumnDef="email"><th mat-header-cell *matHeaderCellDef>Email</th><td mat-cell *matCellDef="let c">{{ c.email }}</td></ng-container>
+    <ng-container matColumnDef="acciones">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let c">
+        <button mat-icon-button (click)="editarCliente(c)" matTooltip="Editar"><mat-icon>edit</mat-icon></button>
+        <button mat-icon-button color="warn" (click)="eliminarCliente(c)" matTooltip="Eliminar"><mat-icon>delete</mat-icon></button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="cliColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: cliColumns"></tr>
+  </table>
+</mat-card>

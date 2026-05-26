@@ -1,0 +1,45 @@
+.detalle {
+  max-width: 800px;
+  margin: 0 auto;
+
+  img {
+    height: 320px;
+    object-fit: cover;
+  }
+
+  .descripcion {
+    color: #555;
+    margin: 8px 0 16px;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .price {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1565c0;
+    margin: 12px 0;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #2e7d32;
+
+    &.unavailable {
+      color: #c62828;
+    }
+  }
+}
+
+small {
+  font-size: 0.8em;
+  color: #777;
+  font-weight: 400;
+}
